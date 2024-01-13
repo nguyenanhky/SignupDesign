@@ -2,6 +2,13 @@
     <string name="app_name">SignupDesign</string>
     <string name="create_account">Create an account for free to get started!</string>
     <string name="label_name">Name</string>
+    <string name="input_name">Name</string>
     <string name="label_email">Email</string>
+    <string name="input_email">Type your email address</string>
+    <string name="input_password">Type input password</string>
     <string name="label_password">Password</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="label_or">OR</string>
+    <string name="question_login">Already have an account?</string>
+    <string name="label_log_in">Log in</string>
 </resources>

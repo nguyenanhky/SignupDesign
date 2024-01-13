@@ -15,6 +15,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,12 +28,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,9 +48,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,6 +63,16 @@ import kynv1.fsoft.signupdesign.ui.theme.SignupDesignTheme
 private val String.isValidName: Boolean
     get() {
         return this.length > 3
+    }
+
+private val String.isValidEmail: Boolean
+    get() {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+    }
+
+private val String.isValidPassword: Boolean
+    get() {
+        return this.length >= 8
     }
 
 class MainActivity : ComponentActivity() {
@@ -132,81 +151,420 @@ fun SignupScreen(
             modifier = Modifier.padding(start = 9.dp)
         )
         Spacer(Modifier.height(13.dp))
-        val name = remember {
-            mutableStateOf("")
-        }
-        val nameFocused = remember {
+        NameField()
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = stringResource(id = R.string.label_email),
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 9.dp)
+        )
+        Spacer(Modifier.height(13.dp))
+        EmailField()
+        Spacer(Modifier.height(18.dp))
+        Text(
+            text = stringResource(id = R.string.label_password),
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 9.dp)
+        )
+        Spacer(Modifier.height(13.dp))
+        PasswordField()
+        /////////////////////////////////
+        Spacer(modifier = Modifier.height(31.dp))
+        val buttonPress = remember {
             mutableStateOf(false)
         }
-        val nameFieldUpperBorderColor = animateColorAsState(
-            targetValue = if (nameFocused.value) Color(0xff5133FF) else Color(0xff282828),
-            animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+        val buttonLeftColor = animateColorAsState(
+            targetValue =
+            if (buttonPress.value)
+                Color(0xff480F63)
+            else Color(0xff3C28C6),
+            animationSpec = tween(
+                durationMillis = 100,
+                easing = LinearEasing
+            )
         )
-
-        val nameFieldBottomBorderColor = animateColorAsState(
-            targetValue = if (nameFocused.value) Color(0xff100F6C) else Color(0xff282828),
-            animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+        val buttonRightColor = animateColorAsState(
+            targetValue =
+            if (buttonPress.value)
+                Color(0xff3C28C6)
+            else
+                Color(0xff480F63),
+            animationSpec = tween(
+                durationMillis = 100,
+                easing = LinearEasing
+            )
         )
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(64.dp)
-                .clip(shape = RoundedCornerShape(12.dp))
-                .background(color = Color(0xff171717))
-                .border(
-                    width = 2.dp,
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            nameFieldUpperBorderColor.value,
-                            nameFieldBottomBorderColor.value
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            buttonLeftColor.value,
+                            buttonRightColor.value
                         )
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                    )
                 )
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 18.dp)
-                    .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            buttonPress.value = true
+                        },
+                        onTap = {
+                            buttonPress.value = false
+                        }
+                    )
+                },
 
-                Box(
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(id = R.string.sign_up),
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp,
+                color = Color.White
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                color = Color.Gray,
+                thickness = 2.dp,
+            )
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = stringResource(id = R.string.label_or),
+                color = Color(0xffAAAAAA),
+                fontSize = 12.sp
+            )
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                color = Color.Gray,
+                thickness = 2.dp,
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(color = Color(0xff171717))
+                    .border(
+                        width = 2.dp,
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xff252525)
+                    )
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.google_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp),
+                    tint = Color.White
+                )
+            }
+            Spacer(Modifier.width(18.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(color = Color(0xff171717))
+                    .border(
+                        width = 2.dp,
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xff252525)
+                    )
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.twitter),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp),
+                    tint = Color.White
+                )
+            }
+
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                stringResource(id = R.string.question_login),
+                color = Color.Gray
+            )
+            TextButton(
+                onClick = { /*TODO*/ },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    stringResource(id = R.string.label_log_in),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun NameField() {
+    val name = remember {
+        mutableStateOf("")
+    }
+    val nameFocused = remember {
+        mutableStateOf(false)
+    }
+    val nameFieldUpperBorderColor = animateColorAsState(
+        targetValue = if (nameFocused.value) Color(0xff5133FF) else Color(0xff282828),
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+    )
+
+    val nameFieldBottomBorderColor = animateColorAsState(
+        targetValue = if (nameFocused.value) Color(0xff100F6C) else Color(0xff282828),
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(color = Color(0xff171717))
+            .border(
+                width = 2.dp,
+                brush = Brush.verticalGradient(
+                    listOf(
+                        nameFieldUpperBorderColor.value,
+                        nameFieldBottomBorderColor.value
+                    )
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 18.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                if (name.value.isEmpty()) {
+                    Text(text = stringResource(id = R.string.input_name), color = Color.Gray)
+                }
+                BasicTextField(
+                    value = name.value,
+                    onValueChange = { newName ->
+                        name.value = newName
+                    },
+                    textStyle = TextStyle(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    cursorBrush = SolidColor(Color.White),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    if (name.value.isEmpty()) {
-                        Text(text = stringResource(id = R.string.label_name), color = Color.Gray)
-                    }
-                    BasicTextField(
-                        value = name.value,
-                        onValueChange = { newName ->
-                            name.value = newName
-                        },
-                        textStyle = TextStyle(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        cursorBrush = SolidColor(Color.White),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                nameFocused.value = it.isFocused
-                                Logger.lod("onFocusChange")
-                            }
+                        .onFocusChanged {
+                            nameFocused.value = it.isFocused
+                            Logger.lod("onFocusChange")
+                        }
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(shape = RoundedCornerShape(6.dp))
+                    .background(color = if (name.value.isValidName) Color(0xff282828) else Color.Transparent),
+                contentAlignment = Alignment.Center
+            ) {
+                AnimatorVectorExample(name.value.isValidName)
+            }
+        }
+    }
+}
+
+@Composable
+fun EmailField() {
+    val email = remember {
+        mutableStateOf("")
+    }
+    val emailFocused = remember {
+        mutableStateOf(false)
+    }
+    val emailFieldUpperBorderColor = animateColorAsState(
+        targetValue = if (emailFocused.value) Color(0xff5133FF) else Color(0xff282828),
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+    )
+
+    val emailFieldBottomBorderColor = animateColorAsState(
+        targetValue = if (emailFocused.value) Color(0xff100F6C) else Color(0xff282828),
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(color = Color(0xff171717))
+            .border(
+                width = 2.dp,
+                brush = Brush.verticalGradient(
+                    listOf(
+                        emailFieldUpperBorderColor.value,
+                        emailFieldBottomBorderColor.value
                     )
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 18.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                if (email.value.isEmpty()) {
+                    Text(text = stringResource(id = R.string.input_email), color = Color.Gray)
                 }
-                Box(
+                BasicTextField(
+                    value = email.value,
+                    onValueChange = { newName ->
+                        email.value = newName
+                    },
+                    textStyle = TextStyle(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    cursorBrush = SolidColor(Color.White),
                     modifier = Modifier
-                        .size(24.dp)
-                        .clip(shape = RoundedCornerShape(6.dp))
-                        .background(color = if (name.value.isValidName) Color(0xff282828) else Color.Transparent),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AnimatorVectorExample(name.value.isValidName)
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            emailFocused.value = it.isFocused
+                            Logger.lod("onFocusChange")
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email
+                    )
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(shape = RoundedCornerShape(6.dp))
+                    .background(color = if (email.value.isValidEmail) Color(0xff282828) else Color.Transparent),
+                contentAlignment = Alignment.Center
+            ) {
+                AnimatorVectorExample(email.value.isValidEmail)
+            }
+        }
+    }
+}
+
+@Composable
+fun PasswordField() {
+    val email = remember {
+        mutableStateOf("")
+    }
+    val emailFocused = remember {
+        mutableStateOf(false)
+    }
+    val emailFieldUpperBorderColor = animateColorAsState(
+        targetValue = if (emailFocused.value) Color(0xff5133FF) else Color(0xff282828),
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+    )
+
+    val emailFieldBottomBorderColor = animateColorAsState(
+        targetValue = if (emailFocused.value) Color(0xff100F6C) else Color(0xff282828),
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(color = Color(0xff171717))
+            .border(
+                width = 2.dp,
+                brush = Brush.verticalGradient(
+                    listOf(
+                        emailFieldUpperBorderColor.value,
+                        emailFieldBottomBorderColor.value
+                    )
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 18.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                if (email.value.isEmpty()) {
+                    Text(text = stringResource(id = R.string.input_password), color = Color.Gray)
                 }
+                BasicTextField(
+                    value = email.value,
+                    onValueChange = { newName ->
+                        email.value = newName
+                    },
+                    textStyle = TextStyle(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    cursorBrush = SolidColor(Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            emailFocused.value = it.isFocused
+                            Logger.lod("onFocusChange")
+                        },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(shape = RoundedCornerShape(6.dp))
+                    .background(color = if (email.value.isValidPassword) Color(0xff282828) else Color.Transparent),
+                contentAlignment = Alignment.Center
+            ) {
+                AnimatorVectorExample(email.value.isValidPassword)
             }
         }
     }

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SignupDesign</string>
+    <string name="create_account">Create an account for free to get started!</string>
+    <string name="label_name">Name</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+</resources>
